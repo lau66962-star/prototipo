@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/sprites/jugador_walk.png" id="1_walk"]
 [ext_resource type="Texture2D" path="res://assets/sprites/jugador_idle.png" id="2_idle"]
 [ext_resource type="Texture2D" path="res://assets/sprites/arbol.png" id="3_arbol"]
 [ext_resource type="Script" path="res://scripts/jugador.gd" id="4_jug"]
 [ext_resource type="Shader" path="res://scripts/gris.gdshader" id="5_shader"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="6_main"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gris"]
 shader = ExtResource("5_shader")
@@ -13,84 +14,68 @@ shader_parameter/mezcla = 1.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_figura"]
 size = Vector2(12, 8)
 
-[sub_resource type="Gradient" id="Gradient_fondo"]
-offsets = PackedFloat32Array(0, 0.35, 1)
-colors = PackedColorArray(0.22, 0.22, 0.25, 1, 0.32, 0.32, 0.36, 1, 0.40, 0.40, 0.44, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_fondo"]
-gradient = SubResource("Gradient_fondo")
-fill = 1
-
 [node name="Main" type="Node2D"]
+script = ExtResource("6_main")
 
-[node name="Fondo" type="CanvasLayer" parent="." layer="-10"]
-layout_mode = 3
+[node name="Mundo" type="SubViewport" parent="."]
+size = Vector2i(288, 162)
 
-[node name="ColorRectFondo" type="ColorRect" parent="Fondo"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = SubResource("GradientTexture2D_fondo")
+[node name="Decoracion" type="Node2D" parent="Mundo"]
 
-[node name="Decoracion" type="Node2D" parent="."]
-
-[node name="Arbol1" type="Sprite2D" parent="Decoracion"]
-position = Vector2(80, -110)
+[node name="Arbol1" type="Sprite2D" parent="Mundo/Decoracion"]
+position = Vector2(70, -80)
 texture = ExtResource("3_arbol")
 hframes = 4
 
-[node name="Arbol2" type="Sprite2D" parent="Decoracion"]
-position = Vector2(-140, 60)
+[node name="Arbol2" type="Sprite2D" parent="Mundo/Decoracion"]
+position = Vector2(-100, 40)
 texture = ExtResource("3_arbol")
 hframes = 4
 
-[node name="Arbol3" type="Sprite2D" parent="Decoracion"]
-position = Vector2(160, 130)
+[node name="Arbol3" type="Sprite2D" parent="Mundo/Decoracion"]
+position = Vector2(110, 90)
 texture = ExtResource("3_arbol")
 hframes = 4
 
-[node name="Arbol4" type="Sprite2D" parent="Decoracion"]
-position = Vector2(-60, -160)
+[node name="Arbol4" type="Sprite2D" parent="Mundo/Decoracion"]
+position = Vector2(-50, -120)
 texture = ExtResource("3_arbol")
 hframes = 4
 
-[node name="Arbol5" type="Sprite2D" parent="Decoracion"]
-position = Vector2(40, 220)
+[node name="Arbol5" type="Sprite2D" parent="Mundo/Decoracion"]
+position = Vector2(30, 160)
 texture = ExtResource("3_arbol")
 hframes = 4
 
-[node name="Arbol6" type="Sprite2D" parent="Decoracion"]
-position = Vector2(-220, -60)
+[node name="Arbol6" type="Sprite2D" parent="Mundo/Decoracion"]
+position = Vector2(-170, -40)
 texture = ExtResource("3_arbol")
 hframes = 4
 
-[node name="Jugador" type="CharacterBody2D" parent="."]
+[node name="Jugador" type="CharacterBody2D" parent="Mundo"]
 script = ExtResource("4_jug")
 
-[node name="Sprite" type="Sprite2D" parent="Jugador"]
+[node name="Sprite" type="Sprite2D" parent="Mundo/Jugador"]
 texture = ExtResource("1_walk")
 hframes = 8
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Jugador"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Jugador"]
 position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_figura")
 
-[node name="Camera2D" type="Camera2D" parent="Jugador"]
-zoom = Vector2(4, 4)
+[node name="Camera2D" type="Camera2D" parent="Mundo/Jugador"]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="GrisFiltro" type="CanvasLayer" parent="." layer="10"]
-layout_mode = 3
+[node name="UI" type="CanvasLayer" parent="."]
 
-[node name="ColorRectGris" type="ColorRect" parent="GrisFiltro"]
-material = SubResource("ShaderMaterial_gris")
+[node name="PantallaGris" type="TextureRect" parent="UI"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+material = SubResource("ShaderMaterial_gris")
+expand_mode = 1
+stretch_mode = 0
