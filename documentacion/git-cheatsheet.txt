@@ -1,0 +1,254 @@
+# 🐙 Chuleta de Git — completa, en fácil
+
+> Guía rápida con todo lo que usamos + lo que te va a hacer falta.
+> Cada comando tiene su "qué hace" en una línea + ejemplo.
+
+---
+
+## 1. Configuración inicial (una vez por PC)
+
+```bash
+git config --global user.name "Tu Nombre"       # Tu nombre en los commits
+git config --global user.email "tu@mail.com"    # Tu email en los commits
+git config --global core.editor "code --wait"   # Editor por defecto (VsCode)
+git config --list                               # Ver toda tu configuración
+git config --global alias.lg "log --oneline --graph"  # Atajos personalizados
+```
+
+---
+
+## 2. Iniciar un repo
+
+```bash
+git init                     # Convertir la carpeta actual en un repo
+git clone https://...        # Copiar un repo existente desde GitHub (o GitLab)
+```
+
+**¿Qué diferencia hay?** `init` = creás desde cero. `clone` = copiás algo que ya existe.
+
+---
+
+## 3. El ciclo de todos los días
+
+```bash
+git status                 # ¿Qué está pasando? Qué cambió, qué falta
+git add .                  # Preparar TODO lo que cambié
+git add archivo.txt        # Preparar UN archivo
+git add carpeta/           # Preparar una carpeta entera
+git commit -m "mensaje"    # Guardar un punto de la historia
+git push                   # Subir mis commits a GitHub
+```
+
+**El baile:** editar → `git status` → `git add` → `git commit` → `git push` → repetir.
+
+### Variantes útiles de commit
+
+```bash
+git commit -am "mensaje"         # add + commit de TODO lo ya rastreado (una línea)
+git commit --amend -m "nuevo"    # Corregir el mensaje del último commit
+git commit --amend               # Agregar archivos olvidados al último commit
+```
+
+> ⚠️ `--amend` reescribe el último commit: usalo SOLO si no lo pusheaste aún.
+
+---
+
+## 4. Inspeccionar / ver la historia
+
+```bash
+git log --oneline                 # Historial, 1 línea por commit
+git log --oneline --graph         # Historial CON el árbol de ramas 🌳
+git log --oneline -5              # Solo los últimos 5 commits
+git log --oneline --all           # De TODAS las ramas
+git log --stat                    # Qué archivos tocó cada commit
+git log -p                        # Y además, el detalle de cada cambio
+git log --author="nombre"         # Commits de una persona
+git log -S "texto"                # Commits que agregaron/borraron ese texto
+git show ID                       # Ver un commit específico completo
+git show ID:archivo.txt           # Ver cómo era UN archivo en ese commit
+git diff                          # Cambios SIN preparar (working vs stage)
+git diff --cached                 # Cambios YA preparados (stage vs último commit)
+git blame archivo.txt             # Quién tocó cada línea (y cuándo)
+git shortlog -s -n                # Ranking: quién committeó más
+git describe --tags               # Última etiqueta alcanzada desde acá
+```
+
+---
+
+## 5. Deshacer / arreglar
+
+| Comando | Qué hace |
+|---|---|
+| `git restore archivo.txt` | Descarto cambios sin guardar de un archivo |
+| `git restore --staged archivo.txt` | Lo saco del stage (queda modificado, no borrado) |
+| `git checkout -- archivo.txt` | Versión vieja de restore (igual que el primero) |
+| `git reset --soft HEAD~1` | Quito el último commit, dejo cambios preparados |
+| `git reset --mixed HEAD~1` | Quito el último commit, dejo cambios sueltos (default) |
+| `git reset --hard HEAD~1` | Quito el último commit Y sus cambios. ⚠️ |
+| `git reset --hard ID` | Volver el repo a un commit específico (borrando lo demás) |
+| `git revert ID` | Commit nuevo que deshace uno viejo (seguro, respeta historia) |
+| `git clean -n` | Muestra archivos sin trackear que se borrarían |
+| `git clean -f` | Borra los archivos sin trackear. ⚠️ |
+| `git reflog` | Registro de todo lo que hiciste → tu seguro de vida |
+
+**Regla mental:** `restore` = deshacer sin guardar · `reset` = mover el repo a atrás · `revert` = deshacer con un commit nuevo.
+
+---
+
+## 6. Stash: guardar trabajo a medias 🧺
+
+Sirve cuando cambiás de rama pero no querés perder lo que venís haciendo sin commitear.
+
+```bash
+git stash                    # Guardá TODO lo sin-commitear y limpiá la carpeta
+git stash list               # Ver los guardados
+git stash pop                # Recuperar el último guardado (y borrarlo de la lista)
+git stash apply              # Recuperar el último guardado (conservándolo)
+git stash drop               # Borrar el último guardado sin recuperarlo
+git stash --include-untracked  # Guardar incluso archivos NUEVOS (no solo modificados)
+```
+
+---
+
+## 7. Las ramas (branches)
+
+```bash
+git branch                        # Listar ramas (la * es donde estás)
+git branch nombre                 # Crear una rama
+git branch -m nuevo-nombre        # Renombrar la rama actual
+git branch -m vieja nueva         # Renombrar otra rama
+git branch -a                     # Ver locales + las del remoto
+git branch -vv                    # Ver ramas + relación con sus remotos
+git checkout nombre               # Cambiarte de rama
+git checkout -b nombre            # Atajo: crear Y cambiarte a la vez
+git switch nombre                 # Versión moderna de checkout (cambiar)
+git switch -c nombre              # Versión moderna de checkout -b
+git merge nombre                  # Fusionar nombre DENTRO de la rama actual
+git branch -d nombre              # Borrar rama (seguro: solo si está fusionada)
+git branch -D nombre              # Borrar rama a la fuerza ⚠️
+```
+
+**Regla mental:** `checkout master` (parate ahí) → `merge beta` (traé beta ahí). El merge va hacia donde estás parado.
+
+---
+
+## 8. Merge, rebase y cherry-pick
+
+### Merge (unir ramas)
+
+```bash
+git merge beta                     # Une beta a la rama actual (crea commit de merge)
+git merge --no-ff beta             # Fuerza un commit de merge (útil para dejar historia clara)
+git merge --abort                  # Aborto el merge si estoy en un conflicto
+```
+
+### Rebase (reacomodar commits en fila) 🔄
+
+```bash
+git rebase master                  # Re-pongo mis commits ENCIMA de master
+git rebase -i HEAD~3               # Interactivo: pick, drop, squash (reordenar commit)
+git rebase --continue              # Seguir tras resolver un conflicto
+git rebase --abort                 # Abortar todo y volver atrás
+```
+
+**Merge vs Rebase (en corto):** merge = "una unión con testimonio" (se nota en la historia). rebase = "reacomodé mis commits como si nunca hubiera pisado la rama" (historia limpia y lineal). En equipos se usa merge; rebase es para historia prolija o trabajo local.
+
+### Cherry-pick (traer commit suelto) 🍒
+
+```bash
+git cherry-pick ID          # Traer UN commit específico a la rama actual
+git cherry-pick ID1 ID2     # Traer varios
+```
+
+**Cuándo:** querés solo el arreglo de otra rama, sin fusionar la rama entera.
+
+---
+
+## 9. Remotos y GitHub
+
+```bash
+git remote -v                          # Ver apodos de remotos y sus URLs
+git remote add douglas https://...     # Agregar un remoto
+git remote rename viejo nuevo          # Renombrar un remoto
+git remote remove douglas              # Quitar un remoto
+git push                               # Subir la rama actual
+git push -u douglas beta               # Presentar una rama nueva (1ª vez)
+git push --force                       # Sobrescribir GitHub con lo local ⚠️
+git push douglas --delete beta         # Borrar una rama remota
+git clone https://...                  # Copiar un repo completo
+git pull                               # Bajar cambios Y aplicarlos (fetch + merge)
+git fetch                              # Bajar referencias SIN aplicarlas
+git fetch --prune                      # Bajar y limpiar ramas remotas borradas
+```
+
+**Regla mental:** `pull` = `fetch` + aplico. Si no sabés qué pasó, `fetch` primero, mirás, y después decidís.
+
+---
+
+## 10. Tags: marcar versiones 🏷️
+
+```bash
+git tag                                  # Listar etiquetas
+git tag v1.0                             # Crear etiqueta en el commit actual
+git tag -a v1.0 -m "Primera versión"     # Etiqueta anotada (con mensaje)
+git tag v1.0 ID                          # Etiquetar un commit viejo
+git show v1.0                            # Ver la etiqueta
+git push douglas v1.0                    # Subir una etiqueta a GitHub
+git push douglas --tags                  # Subir todas
+git tag -d v1.0                          # Borrar local
+git push douglas --delete v1.0           # Borrar del remoto
+```
+
+**Regla mental:** las ramas se mueven (cambian de commit), los **tags NO** (fijan un momento exacto = versiones).
+
+---
+
+## 11. .gitignore: lo que Git no debe ver 🙈
+
+```bash
+# creá un archivo llamado .gitignore en la raíz con líneas así:
+
+node_modules/        # carpeta ignorada
+.env                 # archivo con secretos
+*.log                # todo archivo .log
+!importante.log      # excepción: este sí lo trackeo
+```
+
+```bash
+git status --ignored   # Ver qué está siendo ignorado
+```
+
+**Regla de oro:** secretos (contraseñas, tokens) y basura (builds, node_modules) NUNCA van a GitHub → `.gitignore`.
+
+---
+
+## 12. Frases que te tira Git (traducidas)
+
+| Mensaje | Significado |
+|---|---|
+| `nothing to commit` | No hay cambios nuevos — todo ya está guardado |
+| `Already up to date` | Ya está todo fusionado, no hay nada que unir |
+| `no upstream branch` | Rama nueva nunca presentada → `git push -u douglas <rama>` |
+| `not fully merged` | Git no borra porque hay commits aún no subidos/fusionados |
+| `fast-forward` | Fusión directa y limpia (la rama venía justo detrás) |
+| `LF will be replaced by CRLF` | Aviso inofensivo de saltos de línea de Windows |
+| `merge conflict` | Dos versiones tocaron lo mismo → elegís a mano |
+| `fatal: not a git repository` | Estás en una carpeta que no es repo (o mal ruta) |
+| `permission denied (publickey)` | Problema de acceso SSH — revisá tus llaves |
+
+---
+
+## 13. Seguridad y buenas costumbres
+
+```bash
+git status             # ¿Qué estoy por guardar? (antes de commitear)
+git log --oneline      # ¿Cuál es el commit que quiero? (antes de deshacer)
+git pull               # ¿Hay algo nuevo en GitHub? (antes de trabajar)
+git fetch              # ¿Qué hay en el remoto? (sin desordenar nada)
+git reflog             # ¿Me perdí? TODO se recupera desde acá
+```
+
+**Las tres reglas de oro finales:**
+1. `git branch -d` con calma, `-D` con certeza absoluta. 🧘
+2. `--force` y `--hard` solo cuando sabés EXACTAMENTE qué estás haciendo. ⚠️
+3. Casi todo se recupera con `git reflog` — respirá antes de entrar en pánico. 😌

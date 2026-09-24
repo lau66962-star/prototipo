@@ -1,0 +1,22 @@
+; Engine configuration file.
+; Editado manualmente como primer esqueleto del proyecto.
+config_version=5
+
+[application]
+
+config/name="Prototipo Pixel"
+config/description="Juego sobre un protagonista que descubre su valor. Gris a color."
+run/main_scene="res://escenas/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=1152
+window/size/viewport_height=648
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
